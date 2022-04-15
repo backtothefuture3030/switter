@@ -1,6 +1,8 @@
-import { dbService } from "fbase";
 import React, { useEffect, useState } from "react" ;
+
 import Sweet from "components/Sweet"
+import { v4 as uuidv4 } from "uuid";
+import { dbService, storageService } from "fbase";
 
 const Home= ({userObj}) => {
     const [sweet, setSweet] = useState("");
@@ -17,12 +19,16 @@ const Home= ({userObj}) => {
     }, []);
     const onSubmit = async (event) =>{
         event.preventDefault();
-        await dbService.collection("sweets").add({
-            text:sweet,
-            createdAt: Date.now(),
-            craetorId : userObj.uid,
-        });
-        setSweet("");
+        const fileRef = storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
+        const response = await fileRef.putString(attachment, "data_url");
+        console.log(response);
+
+        // await dbService.collection("sweets").add({
+        //     text:sweet,
+        //     createdAt: Date.now(),
+        //     craetorId : userObj.uid,
+        // });
+        // setSweet("");
     };
     const onChange = (event)=>{
         const { target:{value},
